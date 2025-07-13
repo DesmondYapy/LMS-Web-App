@@ -56,6 +56,49 @@ with tab1:
     st.bar_chart(topic_counts, y_label="Number of Topics", x_label="Course Title")
 
 
+    merged_enroll_courses = merged_enroll_course.merge(users,on='user_id')
+    entries_with_course = entries.merge(topics, on='topic_id')
+    entries_filtered = entries_with_course[entries_with_course['course_id'].isin([23409,34290,15697])]
+    entry_stats = entries_filtered.groupby('entry_posted_by_user_id').agg(
+    num_entries=('entry_content', 'count'),
+    num_topics=('topic_id', 'nunique')
+    ).reset_index()
+    students = merged_enroll_courses[merged_enroll_courses['course_code'].isin(instructor_courses)][
+        ['user_id', 'user_name', 'semester','course_code']
+    ]
+
+    students_with_stats = students.merge(
+        entry_stats,
+        left_on='user_id',
+        right_on='entry_posted_by_user_id',
+        how='left'
+        )
+
+    students_with_stats[['num_entries', 'num_topics']] = students_with_stats[['num_entries', 'num_topics']].fillna(0).astype(int)
+    
+    at_risk_students = students_with_stats[
+        students_with_stats['num_entries'] == 0
+    ][['user_id', 'user_name', 'course_code','num_entries']]
+    st.subheader("🚨 At-Risk Students (No Entries Made)")
+    
+    at_risk_total = at_risk_students['course_code'].value_counts()
+    at_risk_total = at_risk_students['course_code'].value_counts().to_dict()
+
+    cols = st.columns(3)
+
+    for idx, (course_code, count) in enumerate(at_risk_total.items()):
+        col = cols[idx % 3]
+        with col:
+            st.metric(course_code, f"{count} students")
+
+        # Start a new row of columns after every 3 metrics
+        if (idx + 1) % 3 == 0:
+            cols = st.columns(3)
+
+    st.write(at_risk_students.sort_values(['course_code','num_entries','user_id']))
+
+
+
 with tab2:
     # st.title(f'{instructor_courses[0]}: {courses[courses["course_code"]==instructor_courses[0]]['course_name']}')
     st.title('WEB DEVELOPMENT')
@@ -97,9 +140,7 @@ with tab2:
 
 
     # st.write(merged_entries_topic[merged_entries_topic['course_code']==course_code])
-    st.subheader("List of Students")
     merged_enroll_course = merged_enroll_course.merge(users,on='user_id')
-
     # Merge entries with topics to get course_code per entry
     entries_with_course = entries.merge(topics, on='topic_id')
     entries_filtered = entries_with_course[entries_with_course['course_id'] == 23409]
@@ -120,10 +161,26 @@ with tab2:
 
     students_with_stats[['num_entries', 'num_topics']] = students_with_stats[['num_entries', 'num_topics']].fillna(0).astype(int)
 
+
+    st.subheader("Top 3 Students")
+    top3_students = students_with_stats[['user_id', 'user_name', 'num_entries', 'num_topics']] \
+        .sort_values(['num_topics', 'num_entries', 'user_id'], ascending=[False, False, True])\
+        .head(3)\
+
+    cols = st.columns(3)
+
+    for i, (_, row) in enumerate(top3_students.iterrows()):
+        with cols[i]:
+            st.metric("👤 Student", row['user_name'])
+            st.metric("📝 Entries", row['num_entries'])
+            st.metric("📚 Unique Topics", row['num_topics'])
+
+    st.subheader("List of Students")
     st.write(
         students_with_stats[['user_id', 'user_name', 'semester', 'num_entries', 'num_topics']]
         .sort_values(['num_topics', 'num_entries', 'user_id'], ascending=[False, False, True])
     )
+
 
 
 with tab3:
