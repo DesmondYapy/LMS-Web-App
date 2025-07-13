@@ -34,6 +34,37 @@ def get_overview_stats(instructor_courses):
     else:
         return []
 
+def get_at_risk(instructor_courses):
+    response = requests.post("http://localhost:8000/at-risk", json={
+    "instructor_courses": instructor_courses,
+    })
+
+    if response.status_code == 200:
+        at_risk_students = response.json()['at_risk_students']
+        at_risk_total = response.json()['at_risk_total']
+
+        return at_risk_students, at_risk_total
+    
+    else:
+        return []
+
+def get_course_stats(course_code):
+    response = requests.post("http://localhost:8000/course-stats", json={
+    "course_code": course_code,
+    })
+
+    if response.status_code == 200:
+        total_topics=response.json()['total_topics']
+        total_students=response.json()['total_students']
+        total_entries=response.json()['total_entries']
+        entries_per_topic=response.json()['entries_per_topic']
+        weekly_topic_counts=response.json()['weekly_topic_counts']
+    
+        return total_topics, total_students, total_entries, entries_per_topic, weekly_topic_counts
+    
+    else:
+        return []
+    
 courses = pd.read_excel("../Backend/raw_data/courses.xlsx")
 enrollment = pd.read_excel("../Backend/raw_data/enrollment.xlsx")
 entries = pd.read_excel("../Backend/raw_data/entries.xlsx")
@@ -54,10 +85,11 @@ merged_entries_topic = topics \
 
 merged_enroll_course = enrollment.merge(courses, on="course_id")
 
-
+# Overview Tab
 with tabs[0]:
     st.header("📊 All Courses")
     total_topics,total_students,total_entries,topic_counts = get_overview_stats(instructor_courses)
+    at_risk_students, at_risk_total = get_at_risk(instructor_courses)
     
     col1,col2,col3 = st.columns(3)
     with col1:
@@ -69,44 +101,8 @@ with tabs[0]:
 
     st.bar_chart(topic_counts, y_label="Number of Topics", x_label="Course Title")
 
-for i, course_code in enumerate(instructor_courses, start=1):
-    with tabs[i]:
-        st.header(course_code)
-
-
-
-
-tab1,tab2,tab3,tab4 = st.tabs(tab_labels)
-
-with tab1:
-    merged_enroll_courses = merged_enroll_course.merge(users,on='user_id')
-    entries_with_course = entries.merge(topics, on='topic_id')
-    entries_filtered = entries_with_course[entries_with_course['course_id'].isin([23409,34290,15697])]
-    entry_stats = entries_filtered.groupby('entry_posted_by_user_id').agg(
-    num_entries=('entry_content', 'count'),
-    num_topics=('topic_id', 'nunique')
-    ).reset_index()
-    students = merged_enroll_courses[merged_enroll_courses['course_code'].isin(instructor_courses)][
-        ['user_id', 'user_name', 'semester','course_code']
-    ]
-
-    students_with_stats = students.merge(
-        entry_stats,
-        left_on='user_id',
-        right_on='entry_posted_by_user_id',
-        how='left'
-        )
-
-    students_with_stats[['num_entries', 'num_topics']] = students_with_stats[['num_entries', 'num_topics']].fillna(0).astype(int)
-    
-    at_risk_students = students_with_stats[
-        students_with_stats['num_entries'] == 0
-    ][['user_id', 'user_name', 'course_code','num_entries']]
     st.subheader("🚨 At-Risk Students (No Entries Made)")
     
-    at_risk_total = at_risk_students['course_code'].value_counts()
-    at_risk_total = at_risk_students['course_code'].value_counts().to_dict()
-
     cols = st.columns(3)
 
     for idx, (course_code, count) in enumerate(at_risk_total.items()):
@@ -118,7 +114,37 @@ with tab1:
         if (idx + 1) % 3 == 0:
             cols = st.columns(3)
 
-    st.write(at_risk_students.sort_values(['course_code','num_entries','user_id']))
+    st.write(pd.DataFrame(at_risk_students).sort_values(['course_code','num_entries','user_id']))
+
+# Course Specific Tabs
+for i, course_code in enumerate(instructor_courses, start=1):
+    with tabs[i]:
+        total_topics, total_students, total_entries, entries_per_topic, weekly_topic_counts = get_course_stats(course_code)
+        
+        col1,col2,col3 = st.columns(3)
+        with col1:
+            st.metric('Total topics',total_topics)
+        with col2:
+            st.metric('Total Students',total_students)
+        with col3:
+            st.metric('Total Entries', total_entries)
+    
+        st.subheader("Entries per Topic")
+        st.bar_chart(entries_per_topic, y_label="Number of Entries", x_label="Topic Title")
+        
+        st.subheader("Weekly Entry Count per Topic")
+        line_chart_data = pd.DataFrame.from_dict(weekly_topic_counts, orient='index')
+        line_chart_data.index = pd.to_datetime(line_chart_data.index)  # Optional: make index datetime for nicer chart
+        line_chart_data = line_chart_data.sort_index()
+
+        st.line_chart(line_chart_data)
+
+
+
+tab1,tab2,tab3,tab4 = st.tabs(tab_labels)
+
+with tab1:
+    st.header("DONE")
 
 
 

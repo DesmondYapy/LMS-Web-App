@@ -1,7 +1,11 @@
+import pandas as pd 
+
 from fastapi import APIRouter, Depends, HTTPException
 
-from models.request import InstructorCoursesRequest
-from models.response import InstructorCoursesResponse
+from models.request import InstructorCoursesRequest, CourseStatsRequest
+from models.response import InstructorCoursesResponse, CourseStatsResponse
+
+from utils.data_loader import topics, entries, courses, enrollments, users
 
 router = APIRouter()
 
@@ -22,5 +26,71 @@ def get_instructor_courses(data: InstructorCoursesRequest) -> InstructorCoursesR
         return InstructorCoursesResponse(instructor_courses=all_courses)
     else:
         return InstructorCoursesResponse(instructor_courses=instructor_courses)
+
+
+
+@router.post("/course-stats", response_model = CourseStatsResponse)
+def get_course_specific_stats(data: CourseStatsRequest) -> CourseStatsResponse:
+
+    """
+    Returns the list of courses an instructor teaches
+    Admins will see all courses.
+    """
+
+    course_code = data.course_code
+
+    # Merge DataFrames
+    merged_t_ent_c = topics \
+        .merge(entries, on="topic_id", how="left") \
+        .merge(courses, on="course_id", how="left")
+    
+    merged_e_c = enrollments.merge(courses, on='course_id')
+    
+    # Filter DataFrame
+    filtered_merged_t_ent_c = merged_t_ent_c[
+        merged_t_ent_c['course_code'] == course_code
+        ]
+    filtered_merged_e_c = merged_e_c[
+        (merged_e_c['course_code'] == course_code) &
+        (merged_e_c['enrollment_state'] == 'active')
+    ]
+
+    # Extract Stats
+    total_topics = filtered_merged_t_ent_c['topic_title'].nunique()
+    total_students = filtered_merged_e_c['user_id'].nunique()     
+    total_entries = filtered_merged_t_ent_c['entry_id'].nunique()  
+    entries_per_topic = filtered_merged_t_ent_c['topic_title'] \
+        .value_counts() \
+        .sort_index()
+    
+    # Extract line chart data of weekly entries by topic 
+    filtered_merged_t_ent_c['entry_created_at'] = pd.to_datetime(filtered_merged_t_ent_c['entry_created_at'])
+    filtered_merged_t_ent_c = filtered_merged_t_ent_c.dropna(subset=['entry_created_at'])
+    filtered_merged_t_ent_c['week'] = filtered_merged_t_ent_c['entry_created_at'] \
+        .dt.to_period('W') \
+        .apply(lambda r: r.start_time)
+    weekly_topic_counts = filtered_merged_t_ent_c \
+        .groupby(['week', 'topic_title']) \
+        .size() \
+        .reset_index(name='num_entries')
+    pivot_df = weekly_topic_counts.pivot(
+        index='week', 
+        columns='topic_title', 
+        values='num_entries') \
+        .fillna(0)
+    pivot_df = pivot_df.sort_index()
+    pivot_df.index = pivot_df.index.astype(str)
+    weekly_topic_counts = pivot_df.astype(int).to_dict(orient='index')
+
+
+    return CourseStatsResponse(
+        total_topics=total_topics,
+        total_students=total_students,
+        total_entries=total_entries,
+        entries_per_topic=entries_per_topic.to_dict(),
+        weekly_topic_counts=weekly_topic_counts
+    )
+
+
 
 

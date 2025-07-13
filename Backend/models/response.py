@@ -18,3 +18,24 @@ class OverviewStatsResponse(BaseModel):
     total_students : int
     total_entries : int
     topic_counts : Dict[str, int]
+
+
+class AtRiskStudent(BaseModel):
+    user_id: int
+    user_name: str
+    course_code: str
+    num_entries: int
+
+
+class AtRiskResponse(BaseModel):
+    at_risk_students: List[AtRiskStudent]
+    at_risk_total: Dict[str, int]
+
+
+class CourseStatsResponse(BaseModel):
+    total_topics: int
+    total_students: int
+    total_entries: int
+    entries_per_topic: Dict[str, int]
+    weekly_topic_counts: Dict[str, Dict[str, int]]
+
