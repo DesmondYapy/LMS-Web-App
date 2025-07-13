@@ -1,21 +1,20 @@
 # models/response.py
 
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import Dict, List, Optional
 from datetime import datetime
 
 class LoginResponse(BaseModel):
     token: str
     role: str
 
-class EntryResponse(BaseModel):
-    id: int
-    topic_id: int
-    content: str
-    created_at: datetime
 
-class UserSummary(BaseModel):
-    id: int
-    name: str
-    post_count: int
-    last_login: Optional[datetime]
+class InstructorCoursesResponse(BaseModel):
+    instructor_courses : List[str]
+
+
+class OverviewStatsResponse(BaseModel):
+    total_topics : int
+    total_students : int
+    total_entries : int
+    topic_counts : Dict[str, int]

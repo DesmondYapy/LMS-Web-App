@@ -1,3 +1,5 @@
+TODO: API middleware, API dependency, Type checking for functions
+
 ## EC Price Prediction API
 
 This project is an API built using FastAPI to predict the resale prices of Executive Condominiums (EC) in Singapore. The API uses a trained Machine Learning model to provide predictions based on various property attributes such as the project name, area, floor range, type of sale, district, and more.

@@ -1,12 +1,16 @@
 # models/request.py
 
 from pydantic import BaseModel
-from typing import Optional
+from typing import List, Optional
 
 class LoginRequest(BaseModel):
     email: str
     password: str
 
-class PostEntryRequest(BaseModel):
-    topic_id: int
-    content: str
+class InstructorCoursesRequest(BaseModel):
+    instructor_id: int
+    role: Optional[str] = "Instructor"
+
+
+class OverviewStatsRequest(BaseModel):
+    instructor_courses: List[str]

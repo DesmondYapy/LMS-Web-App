@@ -12,12 +12,12 @@ for i, course in enumerate(instructor_courses):
     markdown += f" :{colors[i]}-badge[{course}]"
 st.markdown(markdown)
 
-courses = pd.read_excel("../Backend/data tables/courses.xlsx")
-enrollment = pd.read_excel("../Backend/data tables/enrollment.xlsx")
-entries = pd.read_excel("../Backend/data tables/entries.xlsx")
-login = pd.read_excel("../Backend/data tables/login.xlsx")
-topics = pd.read_excel("../Backend/data tables/topics.xlsx")
-users = pd.read_excel("../Backend/data tables/users.xlsx")
+courses = pd.read_excel("../Backend/raw_data/courses.xlsx")
+enrollment = pd.read_excel("../Backend/raw_data/enrollment.xlsx")
+entries = pd.read_excel("../Backend/raw_data/entries.xlsx")
+login = pd.read_excel("../Backend/raw_data/login.xlsx")
+topics = pd.read_excel("../Backend/raw_data/topics.xlsx")
+users = pd.read_excel("../Backend/raw_data/users.xlsx")
 
 
 merged_entries_topic = topics \

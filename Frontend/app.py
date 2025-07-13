@@ -22,7 +22,7 @@ def login():
                 "password": password
             })
             if response.status_code == 200:
-                token = response.json()['access_token']
+                token = response.json()['token']
                 role = response.json()['role']
                 st.success(f"Welcome, {role}!")
                 st.session_state['token'] = token

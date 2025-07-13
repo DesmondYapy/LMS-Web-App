@@ -5,7 +5,9 @@ from jose import jwt
 from datetime import datetime, timedelta
 from models.user import User
 from utils.db import SessionLocal
-from pydantic import BaseModel
+from models.request import LoginRequest
+from models.response import LoginResponse
+
 
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -21,12 +23,8 @@ def get_db():
     finally:
         db.close()
 
-class LoginRequest(BaseModel):
-    email: str
-    password: str
-
-@router.post("/login")
-def login(data: LoginRequest, db: Session = Depends(get_db)):
+@router.post("/login", response_model=LoginResponse)
+def login(data: LoginRequest, db: Session = Depends(get_db)) -> LoginResponse:
     user = db.query(User).filter(User.email == data.email).first()
     if not user or not pwd_context.verify(data.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
@@ -37,4 +35,5 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
         "exp": datetime.now() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     }
     token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
-    return {"access_token": token, "role": user.role, "token_decoded":jwt.decode(token,SECRET_KEY)}
+
+    return LoginResponse(token=token, role=user.role)

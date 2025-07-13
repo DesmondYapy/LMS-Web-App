@@ -6,18 +6,47 @@ import streamlit as st
 
 st.title("Dashboard")
 
-instructor_courses = ['TEK102','IHU224','LOH116'] # Hardcoded these but it should be via GET request with instructor ID
+def get_instructor_course():
+    response = requests.post("http://localhost:8000/instructor-courses", json={
+        "instructor_id": 0,
+        "role": "instructor"
+        })
 
-courses = pd.read_excel("../Backend/data tables/courses.xlsx")
-enrollment = pd.read_excel("../Backend/data tables/enrollment.xlsx")
-entries = pd.read_excel("../Backend/data tables/entries.xlsx")
-login = pd.read_excel("../Backend/data tables/login.xlsx")
-topics = pd.read_excel("../Backend/data tables/topics.xlsx")
-users = pd.read_excel("../Backend/data tables/users.xlsx")
+    if response.status_code == 200:
+        instructor_courses = response.json()['instructor_courses']
+        return instructor_courses
+    else:
+        return []
+
+def get_overview_stats(instructor_courses):
+    response = requests.post("http://localhost:8000/overview-stats", json={
+    "instructor_courses": instructor_courses,
+    })
+
+    if response.status_code == 200:
+        total_topics = response.json()['total_topics']
+        total_students = response.json()['total_students']
+        total_entries = response.json()['total_entries']
+        topic_counts = response.json()['topic_counts']
+
+        return total_topics,total_students,total_entries,topic_counts
+    
+    else:
+        return []
+
+courses = pd.read_excel("../Backend/raw_data/courses.xlsx")
+enrollment = pd.read_excel("../Backend/raw_data/enrollment.xlsx")
+entries = pd.read_excel("../Backend/raw_data/entries.xlsx")
+login = pd.read_excel("../Backend/raw_data/login.xlsx")
+topics = pd.read_excel("../Backend/raw_data/topics.xlsx")
+users = pd.read_excel("../Backend/raw_data/users.xlsx")
 
 st.header("COURSES YOU ARE TEACHING")
-instructor_courses.insert(0,'Overview')
-tab1, tab2, tab3, tab4 = st.tabs(instructor_courses)
+
+instructor_courses = get_instructor_course()
+tab_labels = ["📊 Overview"] + get_instructor_course()
+
+tabs = st.tabs(tab_labels)
 
 merged_entries_topic = topics \
     .merge(entries, on="topic_id", how="left") \
@@ -25,23 +54,11 @@ merged_entries_topic = topics \
 
 merged_enroll_course = enrollment.merge(courses, on="course_id")
 
-with tab1:
-    # st.title(f'{instructor_courses[0]}: {courses[courses["course_code"]==instructor_courses[0]]['course_name']}')
-    st.title('All Courses')
 
-    total_topics = merged_entries_topic[
-    merged_entries_topic['course_code'].isin(instructor_courses)
-]['topic_title'].nunique()
-
-    total_students = merged_enroll_course[
-        (merged_enroll_course['course_code'].isin(instructor_courses)) &
-        (merged_enroll_course['enrollment_state'] == 'active')
-    ]['user_id'].nunique()
-
-    total_entries = merged_entries_topic[
-        merged_entries_topic['course_code'].isin(instructor_courses)
-        ]['entry_id'].nunique()
-
+with tabs[0]:
+    st.header("📊 All Courses")
+    total_topics,total_students,total_entries,topic_counts = get_overview_stats(instructor_courses)
+    
     col1,col2,col3 = st.columns(3)
     with col1:
         st.metric('Total topics',total_topics)
@@ -50,12 +67,18 @@ with tab1:
     with col3:
         st.metric('Total Entries', total_entries)
 
-    merged_df = topics.merge(courses, on="course_id")
-    topic_counts = merged_df[merged_df['course_code'].isin(instructor_courses)]['course_code'].value_counts().sort_index()
-    st.subheader("Topics per Course")
     st.bar_chart(topic_counts, y_label="Number of Topics", x_label="Course Title")
 
+for i, course_code in enumerate(instructor_courses, start=1):
+    with tabs[i]:
+        st.header(course_code)
 
+
+
+
+tab1,tab2,tab3,tab4 = st.tabs(tab_labels)
+
+with tab1:
     merged_enroll_courses = merged_enroll_course.merge(users,on='user_id')
     entries_with_course = entries.merge(topics, on='topic_id')
     entries_filtered = entries_with_course[entries_with_course['course_id'].isin([23409,34290,15697])]
@@ -102,7 +125,7 @@ with tab1:
 with tab2:
     # st.title(f'{instructor_courses[0]}: {courses[courses["course_code"]==instructor_courses[0]]['course_name']}')
     st.title('WEB DEVELOPMENT')
-    course_code = instructor_courses[1]
+    course_code = instructor_courses[0]
     total_topics = merged_entries_topic[
         merged_entries_topic['course_code'] == course_code
         ]['topic_title'].nunique()
@@ -183,53 +206,53 @@ with tab2:
 
 
 
-with tab3:
-    # st.title(f'{instructor_courses[0]}: {courses[courses["course_code"]==instructor_courses[0]]['course_name']}')
-    st.title('BUSINESS ANALYTICS')
-    course_code = instructor_courses[2]
-    total_topics = merged_entries_topic[
-        merged_entries_topic['course_code'] == course_code
-        ]['topic_title'].nunique()
+# with tab3:
+#     # st.title(f'{instructor_courses[0]}: {courses[courses["course_code"]==instructor_courses[0]]['course_name']}')
+#     st.title('BUSINESS ANALYTICS')
+#     course_code = instructor_courses[2]
+#     total_topics = merged_entries_topic[
+#         merged_entries_topic['course_code'] == course_code
+#         ]['topic_title'].nunique()
     
-    total_students = merged_enroll_course[
-        (merged_enroll_course['course_code'] == course_code) &
-        (merged_enroll_course['enrollment_state'] == 'active')
-    ]['user_id'].nunique()
+#     total_students = merged_enroll_course[
+#         (merged_enroll_course['course_code'] == course_code) &
+#         (merged_enroll_course['enrollment_state'] == 'active')
+#     ]['user_id'].nunique()
 
-    total_entries = merged_entries_topic[
-        merged_entries_topic['course_code'] == course_code
-        ]['entry_id'].nunique()
+#     total_entries = merged_entries_topic[
+#         merged_entries_topic['course_code'] == course_code
+#         ]['entry_id'].nunique()
 
-    col1,col2,col3 = st.columns(3)
-    with col1:
-        st.metric('Total topics',total_topics)
-    with col2:
-        st.metric('Total Students',total_students)
-    with col3:
-        st.metric('Total Entries', total_entries)
+#     col1,col2,col3 = st.columns(3)
+#     with col1:
+#         st.metric('Total topics',total_topics)
+#     with col2:
+#         st.metric('Total Students',total_students)
+#     with col3:
+#         st.metric('Total Entries', total_entries)
 
 
-with tab4:
-    # st.title(f'{instructor_courses[0]}: {courses[courses["course_code"]==instructor_courses[0]]['course_name']}')
-    st.title('SOCIAL WORK')
-    course_code = instructor_courses[3]
-    total_topics = merged_entries_topic[
-        merged_entries_topic['course_code'] == course_code
-        ]['topic_title'].nunique()
+# with tab4:
+#     # st.title(f'{instructor_courses[0]}: {courses[courses["course_code"]==instructor_courses[0]]['course_name']}')
+#     st.title('SOCIAL WORK')
+#     course_code = instructor_courses[3]
+#     total_topics = merged_entries_topic[
+#         merged_entries_topic['course_code'] == course_code
+#         ]['topic_title'].nunique()
     
-    total_students = merged_enroll_course[
-        (merged_enroll_course['course_code'] == course_code) &
-        (merged_enroll_course['enrollment_state'] == 'active')
-    ]['user_id'].nunique()
+#     total_students = merged_enroll_course[
+#         (merged_enroll_course['course_code'] == course_code) &
+#         (merged_enroll_course['enrollment_state'] == 'active')
+#     ]['user_id'].nunique()
 
-    total_entries = merged_entries_topic[
-        merged_entries_topic['course_code'] == course_code
-        ]['entry_id'].nunique()
+#     total_entries = merged_entries_topic[
+#         merged_entries_topic['course_code'] == course_code
+#         ]['entry_id'].nunique()
 
-    col1,col2,col3 = st.columns(3)
-    with col1:
-        st.metric('Total topics',total_topics)
-    with col2:
-        st.metric('Total Students',total_students)
-    with col3:
-        st.metric('Total Entries', total_entries)
+#     col1,col2,col3 = st.columns(3)
+#     with col1:
+#         st.metric('Total topics',total_topics)
+#     with col2:
+#         st.metric('Total Students',total_students)
+#     with col3:
+#         st.metric('Total Entries', total_entries)
