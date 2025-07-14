@@ -69,7 +69,7 @@ By offering detailed analytics on **student engagement**, **discussion board act
 
 ### Main Project Folder: `LMS-Web-App/`
 
-- **Backend/**
+- **`Backend/`**
   - `models/` – Contains all API request, response models, and database models for clean, maintainable, and organized code.
   - `raw_data/` – Stores raw data files (Excel format) used in the project.
   - `routes/` – Contains all FastAPI route files.
@@ -77,11 +77,11 @@ By offering detailed analytics on **student engagement**, **discussion board act
   - `main.py` – Main FastAPI backend application that ties everything together.
   - `seed.py` – Script to create instructor and admin accounts on startup.
 
-- **Frontend/**
+- **`Frontend/`**
   - `admin/` – Contains Streamlit pages and logic related to admin views.
   - `images/` – Folder for storing images to be used in the frontend (e.g., logo), currently empty.
   - `instructor/` – Streamlit pages and logic specific to instructor views.
-  - `utils/` – Helper functions for calling backend API from Streamlit.
+  - `utils/` – Helper functions for calling backend API 
   - `app.py` – Main Streamlit app that ties together all frontend components.
   - `Data_View.py` – Standalone Streamlit page for viewing raw data files.
   - `settings.py` – Placeholder for settings page, currently empty.
@@ -100,6 +100,9 @@ By offering detailed analytics on **student engagement**, **discussion board act
 - [ ] Abstract **student search logic** into backend API for cleaner frontend code.
 - [ ] Complete the **settings page** in the frontend.
 - [ ] Clean and enhance **admin-specific features**.
+- [ ] Add images for logo
+- [ ] Implement caching in frontend for faster response times
+
 
 
 ## 🗂️ Data Description
