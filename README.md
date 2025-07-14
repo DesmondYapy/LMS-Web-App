@@ -45,12 +45,12 @@ By offering detailed analytics on **student engagement**, **discussion board act
 
 3. **Build the Docker image**
     ```bash
-    docker build -t standard-web-app .
+    docker build -t lms-web-app .
     ```
 
 4. **Run the Docker container**
     ```bash
-    docker run -p 8000:8000 -p 8501:8501 standard-web-app
+    docker run -p 8000:8000 -p 8501:8501 lms-web-app
     ```
 
 - **Backend API Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)  
