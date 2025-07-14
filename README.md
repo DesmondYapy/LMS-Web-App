@@ -6,7 +6,6 @@ This project is a **fully functional web application** designed to provide **int
 
 By offering detailed analytics on **student engagement**, **discussion board activity**, and **course participation**, this tool aims to make it easier for educators to **identify at-risk students**, **highlight top contributors**, and **monitor overall class interaction**.
 
----
 
 ## 🛠️ Tech Stack
 
@@ -22,14 +21,12 @@ By offering detailed analytics on **student engagement**, **discussion board act
     - **High performance**, built on **Starlette** and **Pydantic** for speed and data validation.
     - **Asynchronous support** enabling future scalability for high-volume data processing.
 
----
 
 ## 📦 Requirements
 
 - **Docker**: Ensure **Docker** is installed and running on your machine.  
 [Get Docker](https://www.docker.com/products/docker-desktop/)
 
----
 
 ## 🚀 How to Run the Project
 
@@ -40,7 +37,7 @@ By offering detailed analytics on **student engagement**, **discussion board act
 
 2. **Navigate to the project directory**
     ```bash
-    cd LMS-Web-App
+    cd Standard_Web_App
     ```
 
 3. **Build the Docker image**
@@ -56,7 +53,17 @@ By offering detailed analytics on **student engagement**, **discussion board act
 - **Backend API Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)  
 - **Frontend Dashboard**: [http://localhost:8501](http://localhost:8501)
 
----
+
+### ✅ Default Login Credentials
+
+**Instructor Account**  
+- Email: `instructor@test.com`  
+- Password: `instructor123`
+
+**Admin Account**  
+- Email: `admin@test.com`  
+- Password: `admin123`
+
 
 ## 📁 Project Structure
 
@@ -84,7 +91,6 @@ By offering detailed analytics on **student engagement**, **discussion board act
 - **entrypoint.sh** – Shell script to start both backend and frontend servers in Docker and run `seed.py` on startup.
 - **README.md** – Main project documentation file.
 
----
 
 ## ✅ Future TODO List
 
@@ -95,7 +101,6 @@ By offering detailed analytics on **student engagement**, **discussion board act
 - [ ] Complete the **settings page** in the frontend.
 - [ ] Clean and enhance **admin-specific features**.
 
----
 
 ## 🗂️ Data Description
 
