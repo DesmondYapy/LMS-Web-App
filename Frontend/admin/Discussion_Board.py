@@ -3,7 +3,7 @@ import streamlit as st
 
 from utils.api_calls import get_instructor_course, get_discussion_board
 
-instructor_courses = get_instructor_course("instructor")
+instructor_courses = get_instructor_course("admin")
 
 # Start of FE
 st.title("Discussion Board")
