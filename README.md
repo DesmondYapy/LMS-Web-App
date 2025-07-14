@@ -32,7 +32,7 @@ By offering detailed analytics on **student engagement**, **discussion board act
 
 1. **Clone the repository**
     ```bash
-    git clone https://github.com/yourusername/LMS-Web-App.git
+    git clone https://github.com/DesmondYapy/LMS-Web-App.git
     ```
 
 2. **Navigate to the project directory**
