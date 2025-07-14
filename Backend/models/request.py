@@ -3,9 +3,11 @@
 from pydantic import BaseModel
 from typing import List, Optional
 
+
 class LoginRequest(BaseModel):
     email: str
     password: str
+
 
 class InstructorCoursesRequest(BaseModel):
     instructor_id: int
@@ -30,3 +32,7 @@ class TopStudentsRequest(BaseModel):
 
 class DiscussionBoardRequest(BaseModel):
     course_code: str
+
+
+class StudentRequest(BaseModel):
+    user_name: str

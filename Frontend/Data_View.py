@@ -10,7 +10,7 @@ login = pd.read_excel("../Backend/raw_data/login.xlsx")
 topics = pd.read_excel("../Backend/raw_data/topics.xlsx")
 users = pd.read_excel("../Backend/raw_data/users.xlsx")
 
-st.subheader('Courses')
+st.subheader("Courses")
 st.write(courses)
 st.subheader("Enrollment")
 st.write(enrollment)

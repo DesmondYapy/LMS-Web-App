@@ -8,4 +8,3 @@ app.include_router(courses.router)
 app.include_router(overview.router)
 app.include_router(students.router)
 app.include_router(discussion_board.router)
-

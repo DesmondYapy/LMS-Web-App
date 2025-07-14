@@ -16,6 +16,7 @@ SECRET_KEY = "your-secret-key"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
+
 def get_db():
     db = SessionLocal()
     try:
@@ -33,7 +34,7 @@ def login(data: LoginRequest, db: Session = Depends(get_db)) -> LoginResponse:
     token_data = {
         "sub": user.email,
         "role": user.role,
-        "exp": datetime.now() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        "exp": datetime.now() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
     }
     token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
 

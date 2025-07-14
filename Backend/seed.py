@@ -4,8 +4,10 @@ from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+
 def hash_password(password: str):
     return pwd_context.hash(password)
+
 
 def seed():
     Base.metadata.create_all(bind=engine)
@@ -15,12 +17,12 @@ def seed():
         admin = User(
             email="admin@test.com",
             hashed_password=hash_password("admin123"),
-            role="admin"
+            role="admin",
         )
         instructor = User(
             email="instructor@test.com",
             hashed_password=hash_password("instructor123"),
-            role="instructor"
+            role="instructor",
         )
         db.add_all([admin, instructor])
         db.commit()
@@ -29,6 +31,7 @@ def seed():
         print("Users already seeded.")
 
     db.close()
+
 
 if __name__ == "__main__":
     seed()
