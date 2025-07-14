@@ -20,3 +20,6 @@ class AtRiskRequest(BaseModel):
 
 class CourseStatsRequest(BaseModel):
     course_code: str
+
+class TopStudentsRequest(BaseModel):
+    course_code: str

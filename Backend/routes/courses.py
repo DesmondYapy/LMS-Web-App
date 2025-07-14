@@ -33,11 +33,11 @@ def get_instructor_courses(data: InstructorCoursesRequest) -> InstructorCoursesR
 def get_course_specific_stats(data: CourseStatsRequest) -> CourseStatsResponse:
 
     """
-    Returns the list of courses an instructor teaches
-    Admins will see all courses.
+    Returns the course specific statistics
     """
 
     course_code = data.course_code
+    course_name = courses[courses['course_code']==course_code]['course_name'].iloc[0]
 
     # Merge DataFrames
     merged_t_ent_c = topics \
@@ -55,13 +55,11 @@ def get_course_specific_stats(data: CourseStatsRequest) -> CourseStatsResponse:
         (merged_e_c['enrollment_state'] == 'active')
     ]
 
+
     # Extract Stats
     total_topics = filtered_merged_t_ent_c['topic_title'].nunique()
     total_students = filtered_merged_e_c['user_id'].nunique()     
     total_entries = filtered_merged_t_ent_c['entry_id'].nunique()  
-    entries_per_topic = filtered_merged_t_ent_c['topic_title'] \
-        .value_counts() \
-        .sort_index()
     
     # Extract line chart data of weekly entries by topic 
     filtered_merged_t_ent_c['entry_created_at'] = pd.to_datetime(filtered_merged_t_ent_c['entry_created_at'])
@@ -82,8 +80,13 @@ def get_course_specific_stats(data: CourseStatsRequest) -> CourseStatsResponse:
     pivot_df.index = pivot_df.index.astype(str)
     weekly_topic_counts = pivot_df.astype(int).to_dict(orient='index')
 
+    entries_per_topic = filtered_merged_t_ent_c['topic_title'] \
+        .value_counts() \
+        .sort_index()
+
 
     return CourseStatsResponse(
+        course_name=course_name,
         total_topics=total_topics,
         total_students=total_students,
         total_entries=total_entries,

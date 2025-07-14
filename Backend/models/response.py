@@ -33,9 +33,22 @@ class AtRiskResponse(BaseModel):
 
 
 class CourseStatsResponse(BaseModel):
+    course_name: str
     total_topics: int
     total_students: int
     total_entries: int
     entries_per_topic: Dict[str, int]
     weekly_topic_counts: Dict[str, Dict[str, int]]
+    
+
+class StudentStats(BaseModel):
+    user_id: int
+    user_name: str
+    semester: str
+    num_entries: int
+    num_topics: int
+
+class TopStudentsResponse(BaseModel):
+    top_3_students: List[StudentStats]
+    list_of_students: List[StudentStats]
 
