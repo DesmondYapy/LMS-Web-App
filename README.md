@@ -37,7 +37,7 @@ By offering detailed analytics on **student engagement**, **discussion board act
 
 2. **Navigate to the project directory**
     ```bash
-    cd Standard_Web_App
+    cd LMS-Web-App
     ```
 
 3. **Build the Docker image**
@@ -86,6 +86,7 @@ By offering detailed analytics on **student engagement**, **discussion board act
   - `Data_View.py` – Standalone Streamlit page for viewing raw data files.
   - `settings.py` – Placeholder for settings page, currently empty.
 
+- **.gitattributes** – Specifies the entrypoint.sh EOL sequence to be LF for cross-platform compatibility
 - **.gitignore** – Specifies files and directories to exclude from version control.
 - **Dockerfile** – Dockerfile to containerize both backend and frontend services.
 - **entrypoint.sh** – Shell script to start both backend and frontend servers in Docker and run `seed.py` on startup.
