@@ -40,46 +40,46 @@ def logout():
 
 logout_page = st.Page(logout, title="Log out", icon=":material/logout:")
 settings = st.Page("settings.py", title="Settings", icon=":material/settings:")
-data_view = st.Page("Data_View.py", title="Raw Data View")
+data_view = st.Page("Data_View.py", title="Raw Data View", icon=":material/files:")
 
 # Instructor Specific Pages
 dashboard = st.Page(
     "instructor/Dashboard.py",
     title="Dashboard",
-    icon=":material/help:",
+    icon=":material/analytics:",
     default=(st.session_state.role == "instructor"),
 )
 
 discussion_board = st.Page(
     "instructor/Discussion_Board.py",
     title="Discussion Board",
-    icon=":material/help:",
+    icon=":material/forum:",
 )
 
 student_search = st.Page(
     "instructor/Student_Search.py",
     title="Student Search",
-    icon=":material/help:",
+    icon=":material/groups:",
 )
 
 # Admin Specific Pages
 admin_dashboard = st.Page(
     "admin/Dashboard.py",
     title="Dashboard",
-    icon=":material/help:",
+    icon=":material/analytics:",
     default=(st.session_state.role == "admin"),
 )
 
 admin_discussion_board = st.Page(
     "admin/Discussion_Board.py",
     title="Discussion Board",
-    icon=":material/help:",
+    icon=":material/forum:",
 )
 
 admin_student_search = st.Page(
     "admin/Student_Search.py",
     title="Student Search",
-    icon=":material/help:",
+    icon=":material/groups:",
 )
 
 account_pages = [logout_page, settings]

@@ -1,60 +1,111 @@
-TODO: API middleware, API dependency, Type checking for functions, abstract logic in student search into api
+# LMS Discussion Analytics Web Application
 
-## EC Price Prediction API
+## 📌 Project Purpose
 
-This project is an API built using FastAPI to predict the resale prices of Executive Condominiums (EC) in Singapore. The API uses a trained Machine Learning model to provide predictions based on various property attributes such as the project name, area, floor range, type of sale, district, and more.
+This project is a **fully functional web application** designed to provide **intuitive and useful instructor-facing interfaces**, enabling instructors to **gain actionable insights into student participation**. It helps instructors **view, explore, and understand discussion activity** within a Learning Management System (LMS).
 
-## Features
+By offering detailed analytics on **student engagement**, **discussion board activity**, and **course participation**, this tool aims to make it easier for educators to **identify at-risk students**, **highlight top contributors**, and **monitor overall class interaction**.
 
-- **Price Prediction:** The API predicts EC resale prices at two specific points in time:
-  - 5 years after the lease commencement (Minimum Occupancy Period, MOP).
-  - 10 years after the lease commencement (Privatization period).
-- **RESTful API:** Exposes the prediction model through an easily accessible RESTful API endpoint.
-- **Containerized Application:** The entire application is containerized using Docker, making it easy to deploy and run on any environment.
+---
 
-## Requirements
+## 🛠️ Tech Stack
 
-- Docker (ensure Docker is installed and running on your machine)
+### Frontend: Python Streamlit
+- Built using **Streamlit** to **rapidly prototype and visualize interactive dashboards**.
+- Streamlit provides a **fast and easy-to-use** framework ideal for Proof-of-Concept (PoC) development.
+- **Future scope**: When the project matures, it can be migrated to a more robust frontend like **React** for greater customizability and scalability.
 
-## Getting Started
+### Backend: Python FastAPI
+- Built with **FastAPI** for its:
+    - **Intuitive syntax** and easy-to-use API routing.
+    - **Automatic interactive API documentation** with **Swagger UI** (`/docs`).
+    - **High performance**, built on **Starlette** and **Pydantic** for speed and data validation.
+    - **Asynchronous support** enabling future scalability for high-volume data processing.
 
-Follow these steps to run the EC Price Prediction API on your local machine:
+---
 
-### 1. Clone the Repository from GitHub
+## 📦 Requirements
 
-`git clone https://github.com/yourusername/ec-price-prediction-api.git`
+- **Docker**: Ensure **Docker** is installed and running on your machine.  
+[Get Docker](https://www.docker.com/products/docker-desktop/)
 
-`cd ec-price-prediction-ap `
+---
 
-### 2. Build the Docker Image and Run the Container
+## 🚀 How to Run the Project
 
-`docker build -t ec-price-api .`
+1. **Clone the repository**
+    ```bash
+    git clone https://github.com/yourusername/LMS-Web-App.git
+    ```
 
-`docker run -d -p 8000:8000 ec-price-api`
+2. **Navigate to the project directory**
+    ```bash
+    cd LMS-Web-App
+    ```
 
-### 3. Test the API
+3. **Build the Docker image**
+    ```bash
+    docker build -t standard-web-app .
+    ```
 
-`bash test.sh`
+4. **Run the Docker container**
+    ```bash
+    docker run -p 8000:8000 -p 8501:8501 standard-web-app
+    ```
 
-### Additional Information
+- **Backend API Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)  
+- **Frontend Dashboard**: [http://localhost:8501](http://localhost:8501)
 
-API Exposes: `POST /predict`
+---
 
-```
-{
-    "project_name": "TURQUOISE",
-    "area": 203,
-    "floor_range": "01-05",
-    "type_of_sale": 3,
-    "district": 4,
-    "street": "COVE DRIVE",
-    "no_of_units": 1,
-    "latitude": 24997.82171918,
-    "longitude": 28392.53051557,
-    "lease_year": "2007",
-    "contract_date": "0715"
-}
-```
-Data Ingestion from URA API and Model Training can be found in `model_training` folder
+## 📁 Project Structure
 
-“In production, the frontend and backend should ideally be deployed in separate containers to support independent scaling, deployment, and observability. For simplicity and clarity in this assessment, both are served in a single container.”
+### Main Project Folder: `LMS-Web-App/`
+
+- **Backend/**
+  - `models/` – Contains all API request, response models, and database models for clean, maintainable, and organized code.
+  - `raw_data/` – Stores raw data files (Excel format) used in the project.
+  - `routes/` – Contains all FastAPI route files.
+  - `utils/` – Helper functions including data loading utilities and `db.py` for database initialization.
+  - `main.py` – Main FastAPI backend application that ties everything together.
+  - `seed.py` – Script to create instructor and admin accounts on startup.
+
+- **Frontend/**
+  - `admin/` – Contains Streamlit pages and logic related to admin views.
+  - `images/` – Folder for storing images to be used in the frontend (e.g., logo), currently empty.
+  - `instructor/` – Streamlit pages and logic specific to instructor views.
+  - `utils/` – Helper functions for calling backend API from Streamlit.
+  - `app.py` – Main Streamlit app that ties together all frontend components.
+  - `Data_View.py` – Standalone Streamlit page for viewing raw data files.
+  - `settings.py` – Placeholder for settings page, currently empty.
+
+- **.gitignore** – Specifies files and directories to exclude from version control.
+- **Dockerfile** – Dockerfile to containerize both backend and frontend services.
+- **entrypoint.sh** – Shell script to start both backend and frontend servers in Docker and run `seed.py` on startup.
+- **README.md** – Main project documentation file.
+
+---
+
+## ✅ Future TODO List
+
+- [ ] Add **API middleware** for security/authentication.
+- [ ] Implement **API dependencies** for better modularization.
+- [ ] Add **type checking** for helper functions.
+- [ ] Abstract **student search logic** into backend API for cleaner frontend code.
+- [ ] Complete the **settings page** in the frontend.
+- [ ] Clean and enhance **admin-specific features**.
+
+---
+
+## 🗂️ Data Description
+
+| **Table**      | **Description**                                                                 |
+|----------------|---------------------------------------------------------------------------------|
+| **courses**    | Stores information about courses available in the LMS.                          |
+| **topics**     | Contains data about discussion topics posted within courses.                    |
+| **entries**    | Stores individual posts or comments under each discussion topic.                |
+| **users**      | Stores user information such as student or instructor details.                  |
+| **enrollments**| Captures which users are enrolled in which courses.                             |
+| **login**      | Stores login credentials and associated login IDs for each user in the system.  |
+
+

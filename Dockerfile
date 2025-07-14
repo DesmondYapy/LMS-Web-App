@@ -1,19 +1,18 @@
-# Use an official Python runtime as a parent image
-FROM python:3.9-slim
+FROM python:3.11-slim
 
-# Set the working directory
+# Install dependencies
 WORKDIR /app
-
-# Copy the current directory contents into the container
-COPY . /app
-
-# Install the dependencies
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose port 8000
-EXPOSE 8000
+# Copy code
+COPY Backend /app/Backend
+COPY Frontend /app/Frontend
 
-# Command to run the API
+# Seed database
+COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
-ENTRYPOINT ["/app/entrypoint.sh"]
+EXPOSE 8000 8501
+
+CMD ["/app/entrypoint.sh"]
