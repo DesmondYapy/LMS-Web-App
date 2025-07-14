@@ -39,7 +39,7 @@ class CourseStatsResponse(BaseModel):
     total_entries: int
     entries_per_topic: Dict[str, int]
     weekly_topic_counts: Dict[str, Dict[str, int]]
-    
+
 
 class StudentStats(BaseModel):
     user_id: int
@@ -47,8 +47,23 @@ class StudentStats(BaseModel):
     semester: str
     num_entries: int
     num_topics: int
+    
 
 class TopStudentsResponse(BaseModel):
     top_3_students: List[StudentStats]
     list_of_students: List[StudentStats]
 
+
+class Entry(BaseModel):
+    entry_content: Optional[str]
+    entry_created_at: Optional[datetime]
+    user_name: Optional[str]
+
+class Topic(BaseModel):
+    topic_id: int
+    topic_title: str
+    topic_content: str
+    entries: List[Entry]
+
+class DiscussionBoardResponse(BaseModel):
+    topics: List[Topic]

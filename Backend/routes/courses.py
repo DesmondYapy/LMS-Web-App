@@ -1,11 +1,11 @@
 import pandas as pd 
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter
 
 from models.request import InstructorCoursesRequest, CourseStatsRequest
 from models.response import InstructorCoursesResponse, CourseStatsResponse
 
-from utils.data_loader import topics, entries, courses, enrollments, users
+from utils.data_loader import topics, entries, courses, enrollments
 
 router = APIRouter()
 

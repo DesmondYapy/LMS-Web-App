@@ -15,11 +15,18 @@ class InstructorCoursesRequest(BaseModel):
 class OverviewStatsRequest(BaseModel):
     instructor_courses: List[str]
 
+
 class AtRiskRequest(BaseModel):
     instructor_courses: List[str]
+
 
 class CourseStatsRequest(BaseModel):
     course_code: str
 
+
 class TopStudentsRequest(BaseModel):
+    course_code: str
+
+
+class DiscussionBoardRequest(BaseModel):
     course_code: str

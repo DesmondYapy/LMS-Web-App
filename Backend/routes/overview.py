@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter
 
 from models.request import OverviewStatsRequest, AtRiskRequest
 from models.response import OverviewStatsResponse, AtRiskResponse
@@ -49,6 +49,7 @@ def get_overview_stats(data: OverviewStatsRequest) -> OverviewStatsResponse:
         total_entries=total_entries,
         topic_counts=topic_counts.to_dict()
     )
+
 
 @router.post("/at-risk", response_model=AtRiskResponse)
 def get_at_risk_students(data: AtRiskRequest) -> AtRiskResponse:

@@ -1,60 +1,53 @@
-import requests
 import pandas as pd 
-import numpy as np
 import streamlit as st
 
+from utils.api_calls import get_instructor_course, get_discussion_board
+
+instructor_courses = get_instructor_course()
+
+# Start of FE
 st.title("Discussion Board")
-instructor_courses = ['TEK102','IHU224','LOH116'] # Hardcoded these but it should be via GET request with instructor ID
+st.header("Courses You Are Teaching")
 
-courses = pd.read_excel("../Backend/raw_data/courses.xlsx")
-enrollment = pd.read_excel("../Backend/raw_data/enrollment.xlsx")
-entries = pd.read_excel("../Backend/raw_data/entries.xlsx")
-login = pd.read_excel("../Backend/raw_data/login.xlsx")
-topics = pd.read_excel("../Backend/raw_data/topics.xlsx")
-users = pd.read_excel("../Backend/raw_data/users.xlsx")
+tab_labels = [f"{course}" for course in instructor_courses]
+tabs = st.tabs(tab_labels)
 
-st.header("COURSES YOU ARE TEACHING")
-tab1, tab2, tab3 = st.tabs(instructor_courses)    
+# Display of discussion board in tabs
+for i, course_code in enumerate(instructor_courses):
+    with tabs[i]:
 
-with tab1:
-    course_code = instructor_courses[0]
+        topics = get_discussion_board(course_code)
+        
+        if not topics:
+            st.info("No discussion topics available.")
+            continue
 
-    merged_entries_topic = topics \
-        .merge(entries, on="topic_id", how="left") \
-        .merge(courses, on="course_id", how="left")    
+        for topic in topics:
+            st.subheader(f"📝 Topic: {topic['topic_title']} ({topic['topic_id']})")
+            st.caption(f"Content: {topic['topic_content']}")
 
-    merged_entries_topic['entry_created_at'] = pd.to_datetime(merged_entries_topic['entry_created_at'])
+            entries = topic.get('entries', [])
 
-    merged_user = merged_entries_topic.merge(
-            users,
-            left_on='entry_posted_by_user_id',
-            right_on='user_id',
-            how='left'
-        )
+            if not entries:
+                st.write("No entries posted yet.")
+                continue
 
-    filtered = merged_user[merged_user['course_code'] == course_code]
-    filtered = filtered[['topic_id', 'topic_title', 'topic_content', 'entry_content', 'entry_created_at', 'user_name']]
-    grouped = filtered.sort_values('entry_created_at').groupby(['topic_id', 'topic_title','topic_content'])
+            # Entries markdown formatting
+            markdown_entries = []
+            for entry in entries:
+                entry_created_at = pd.to_datetime(entry['entry_created_at']).strftime('%Y-%m-%d %H:%M')
+                md = f"""
+                - **Posted by**: `{entry['user_name']}`  
+                - **When**: {entry_created_at}  
+                - **Content**:  
+                    > {entry['entry_content']}
+                """
+                markdown_entries.append(md)
 
-
-    for (topic_id, topic_title, topic_content), group in grouped:
-        st.subheader(f"📝 Topic: {topic_title} ({topic_id})")
-        st.caption(f"Content: {topic_content}")
-        # Generate a list of markdown strings for each entry
-        markdown_entries = []
-        for _, row in group.iterrows():
-            md = f"""
-            - **Posted by**: `{row['user_name']}`  
-            - **When**: {row['entry_created_at'].strftime('%Y-%m-%d %H:%M')}  
-            - **Content**:  
-                > {row['entry_content']}
-            """
-            markdown_entries.append(md)
-
-        # Display entries in rows of 3 columns
-        for i in range(0, len(markdown_entries), 3):
-            cols = st.columns(3)
-            for j in range(3):
-                if i + j < len(markdown_entries):
-                    with cols[j]:
-                        st.markdown(markdown_entries[i + j])
+            # Display entries in rows of 3 columns
+            for j in range(0, len(markdown_entries), 3):
+                cols = st.columns(3)
+                for k in range(3):
+                    if j + k < len(markdown_entries):
+                        with cols[k]:
+                            st.markdown(markdown_entries[j + k])

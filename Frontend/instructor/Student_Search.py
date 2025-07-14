@@ -4,8 +4,11 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 
+from utils.api_calls import get_instructor_course
+
+instructor_courses = get_instructor_course()
+
 st.header("Student Look-up")
-instructor_courses = ['TEK102', 'IHU224', 'LOH116']  # Ideally fetched via GET with instructor ID
 colors = ["blue", "green", "orange", "red", "violet", "gray"]
 markdown = ""
 for i, course in enumerate(instructor_courses):
